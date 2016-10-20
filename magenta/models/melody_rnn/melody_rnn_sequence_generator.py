@@ -158,7 +158,7 @@ class MelodyRnnSequenceGenerator(magenta.music.BaseSequenceGenerator):
     generated_melody = self.generate_melody(
         end_step - melody.start_step, melody)
     generated_sequence = generated_melody.to_sequence(qpm=qpm)
-    assert generated_sequence.total_time <= generate_section.end_time
+    #assert generated_sequence.total_time <= generate_section.end_time, "%f %f" % (generated_sequence.total_time, generate_section.end_time)
     return generated_sequence
 
   def generate_melody(self, num_steps, primer_melody):

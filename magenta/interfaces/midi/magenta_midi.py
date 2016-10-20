@@ -109,12 +109,11 @@ def main(unused_argv):
   end_call_signal = (None if FLAGS.end_call_control_number is None else
                      midi_hub.MidiSignal(control=FLAGS.end_call_control_number,
                                          value=0))
-  interaction = midi_interaction.CallAndResponseMidiInteraction(
+  interaction = midi_interaction.TeacherForcerMidiInteraction(
       hub,
       FLAGS.qpm,
       generator,
-      phrase_bars=FLAGS.phrase_bars,
-      end_call_signal=end_call_signal)
+      phrase_bars=FLAGS.phrase_bars)
 
   print ''
   print 'Instructions:'
