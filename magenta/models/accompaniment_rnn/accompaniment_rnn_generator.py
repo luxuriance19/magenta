@@ -191,7 +191,7 @@ class AccompanimentRnnSequenceGenerator(magenta.music.BaseSequenceGenerator):
     graph_softmax = self._session.graph.get_collection('softmax')[0]
     graph_temperature = self._session.graph.get_collection('temperature')[0]
 
-    final_state_ = None
+    final_state = None
     for i in range(end_step - accompaniment.end_step):
       if encoder_decoder.predictahead_steps == 0:
         # Add padding.
@@ -204,7 +204,7 @@ class AccompanimentRnnSequenceGenerator(magenta.music.BaseSequenceGenerator):
       if i == 0:
         inputs = encoder_decoder.get_inputs_batch([melody_pair],
                                                   full_length=True)
-        initial_state = self._session.run(initial_state)
+        initial_state = self._session.run(graph_initial_state)
       else:
         inputs = encoder_decoder.get_inputs_batch([melody_pair])
         initial_state = final_state
@@ -218,7 +218,7 @@ class AccompanimentRnnSequenceGenerator(magenta.music.BaseSequenceGenerator):
         # Remove padding.
         accompaniment.set_length(len(accompaniment) - 1)
 
-      encoder_decoder.extend_melodies([accompaniment], softmax_)
+      encoder_decoder.extend_melodies([accompaniment], softmax)
 
     main_melody.transpose(-transpose_amounts[0])
     accompaniment.transpose(-transpose_amounts[1])
