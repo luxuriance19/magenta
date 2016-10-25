@@ -68,6 +68,7 @@ py_binary(
         ":midi_hub",
         ":midi_interaction",
         "//magenta",
+        "//magenta/models/accompaniment_rnn:accompaniment_rnn_generator",
         "//magenta/models/melody_rnn:melody_rnn_sequence_generator",
     ],
 )

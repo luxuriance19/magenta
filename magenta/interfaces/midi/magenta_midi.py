@@ -11,20 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""A MIDI interface to the sequence generators.
-
-Captures monophonic input MIDI sequences and plays back responses from the
-sequence generator.
-"""
-
+"""A MIDI interface to the sequence generators."""
 import time
 
 # internal imports
 import tensorflow as tf
-import magenta
 
+import magenta
 from magenta.interfaces.midi import midi_hub
 from magenta.interfaces.midi import midi_interaction
+from magenta.models.accompaniment_rnn import accompaniment_rnn_generator
 from magenta.models.melody_rnn import melody_rnn_sequence_generator
 
 FLAGS = tf.app.flags.FLAGS
@@ -41,6 +37,10 @@ tf.app.flags.DEFINE_string(
     'output_port',
     'magenta_out',
     'The name of the output MIDI port.')
+tf.app.flags.DEFINE_string(
+    'interaction_type',
+    'call_and_response',
+    "'call_and_response' or 'accompaniment'")
 tf.app.flags.DEFINE_integer(
     'phrase_bars',
     None,
@@ -68,6 +68,7 @@ tf.app.flags.DEFINE_string(
 
 # A map from a string generator name to its class.
 _GENERATOR_MAP = melody_rnn_sequence_generator.get_generator_map()
+_GENERATOR_MAP.update(accompaniment_rnn_generator.get_generator_map())
 
 
 def main(unused_argv):
@@ -80,11 +81,6 @@ def main(unused_argv):
 
   if FLAGS.bundle_file is None:
     print '--bundle_file must be specified.'
-    return
-
-  if (FLAGS.end_call_control_number, FLAGS.phrase_bars).count(None) != 1:
-    print('Exactly one of --end_call_control_number or --phrase_bars should be '
-          'specified.')
     return
 
   try:
@@ -111,41 +107,58 @@ def main(unused_argv):
   hub = midi_hub.MidiHub(FLAGS.input_port, FLAGS.output_port,
                          midi_hub.TextureType.MONOPHONIC)
 
-  start_call_signal = (
-      None if FLAGS.start_call_control_number is None else
-      midi_hub.MidiSignal(control=FLAGS.start_call_control_number, value=0))
-  end_call_signal = (
-      None if FLAGS.end_call_control_number is None else
-      midi_hub.MidiSignal(control=FLAGS.end_call_control_number, value=0))
-  interaction = midi_interaction.CallAndResponseMidiInteraction(
-      hub,
-      FLAGS.qpm,
-      generator,
-      phrase_bars=FLAGS.phrase_bars,
-      start_call_signal=start_call_signal,
-      end_call_signal=end_call_signal)
+  if FLAGS.interaction_type == 'call_and_response':
+    if (FLAGS.end_call_control_number, FLAGS.phrase_bars).count(None) != 1:
+      print('Exactly one of --end_call_control_number or --phrase_bars should '
+            'be specified.')
+      return
 
-  print ''
-  print 'Instructions:'
-  if FLAGS.start_call_control_number is not None:
-    print ('When you want to begin the call phrase, signal control number %d '
-           'with value 0.' % FLAGS.start_call_control_number)
-  print 'Play when you hear the metronome ticking.'
-  if FLAGS.phrase_bars is not None:
-    print ('After %d bars (4 beats), Magenta will play its response.' %
-           FLAGS.phrase_bars)
+    start_call_signal = (
+        None if FLAGS.start_call_control_number is None else
+        midi_hub.MidiSignal(control=FLAGS.start_call_control_number, value=0))
+    end_call_signal = (
+        None if FLAGS.end_call_control_number is None else
+        midi_hub.MidiSignal(control=FLAGS.end_call_control_number, value=0))
+    interaction = midi_interaction.CallAndResponseMidiInteraction(
+        hub,
+        FLAGS.qpm,
+        generator,
+        phrase_bars=FLAGS.phrase_bars,
+        start_call_signal=start_call_signal,
+        end_call_signal=end_call_signal)
+
+    print ''
+    print 'Instructions:'
+    if FLAGS.start_call_control_number is not None:
+      print ('When you want to begin the call phrase, signal control number %d '
+             'with value 0.' % FLAGS.start_call_control_number)
+    print 'Play when you hear the metronome ticking.'
+    if FLAGS.phrase_bars is not None:
+      print ('After %d bars (4 beats), Magenta will play its response.' %
+             FLAGS.phrase_bars)
+    else:
+      print ('When you want to end the call phrase, signal control number %d '
+             'with value 0' % FLAGS.phrase_control_number)
+      print ('At the end of the current bar (4 beats), Magenta will play its '
+             'response.')
+    if FLAGS.start_call_control_number is not None:
+      print ('Once the response completes, the interface will wait for you to '
+             'signal a new call phrase using control number %d.' %
+             FLAGS.start_call_control_number)
+    else:
+      print ('Once the response completes, the metronome will tick and you can '
+             'play again.')
+
+  elif FLAGS.interaction_type == 'accompaniment':
+    FLAGS.predictahead_steps = 1
+    interaction = midi_interaction.AccompanimentMidiInteraction(
+        hub,
+        FLAGS.qpm,
+        generator,
+        predictahead_steps=1)
   else:
-    print ('When you want to end the call phrase, signal control number %d '
-           'with value 0' % FLAGS.end_call_control_number)
-    print ('At the end of the current bar (4 beats), Magenta will play its '
-           'response.')
-  if FLAGS.start_call_control_number is not None:
-    print ('Once the response completes, the interface will wait for you to '
-           'signal a new call phrase using control number %d.' %
-           FLAGS.start_call_control_number)
-  else:
-    print ('Once the response completes, the metronome will tick and you can '
-           'play again.')
+    print "Unknown interaction type: '%s'" % FLAGS.interaction_type
+    return
 
   print ''
   print 'To end the interaction, press CTRL-C.'

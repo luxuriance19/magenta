@@ -496,12 +496,11 @@ class MidiCaptor(threading.Thread):
     If called before the thread terminates, `end_time` is required and any open
     notes will have their end time set to it, any notes starting after it will
     be removed, and any notes ending after it will be truncated. `total_time`
-    will also be set to `end_time`.
+    will also be set to `end_time`. If `end_time` is in the future, the caller
+    will block until it is reached.
 
     Args:
-      end_time: The float time in seconds to close any open notes and after
-          which to close or truncate notes, if the thread is still alive.
-          Otherwise, must be None.
+      end_time: The float time in seconds to treat as the sequence end.
 
     Returns:
       A copy of the current captured NoteSequence proto with open notes closed
@@ -511,6 +510,9 @@ class MidiCaptor(threading.Thread):
       MidiHubException: When the thread is alive and `end_time` is None or the
          thread is terminated and `end_time` is not None.
     """
+    if end_time is not None:
+      concurrency.Sleeper().sleep_until(end_time)
+
     # Make a copy of the sequence currently being captured.
     current_captured_sequence = music_pb2.NoteSequence()
     with self._lock:
