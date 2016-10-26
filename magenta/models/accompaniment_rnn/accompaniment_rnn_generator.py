@@ -28,7 +28,6 @@ from magenta.models.accompaniment_rnn import accompaniment_rnn_encoder_decoder
 from magenta.models.accompaniment_rnn import accompaniment_rnn_graph
 
 
-DEFAULT_ID = 'accompaniment_rnn'
 STEPS_PER_QUARTER = 4
 
 
@@ -39,7 +38,7 @@ class AccompanimentRnnSequenceGenerator(magenta.music.BaseSequenceGenerator):
   instrument 0.
 
   Args:
-      config: A MelodyRnnConfig containing the GeneratorDetails,
+      config: An AccompanimentRnnConfig containing the GeneratorDetails,
           MelodyEncoderDecoder, and HParams to use.
       checkpoint: Where to search for the most recent model checkpoint. Mutually
           exclusive with `bundle`.
@@ -158,6 +157,7 @@ class AccompanimentRnnSequenceGenerator(magenta.music.BaseSequenceGenerator):
     if len(extracted_melodies) == 2:
       main_melody, accompaniment = extracted_melodies
     elif len(extracted_melodies) == 1:
+      # TODO(adarob): This might actually be the accompaniment.
       main_melody = extracted_melodies[0]
       tf.logging.warn(
           'No accompaniment was extracted from the priming sequence. '

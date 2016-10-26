@@ -154,6 +154,7 @@ class Metronome(threading.Thread):
     pitch: The pitch of the metronome's tick `note_on` message.
     duration: The duration of the metronome's tick.
   """
+  daemon = True
 
   def __init__(self,
                outport,

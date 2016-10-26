@@ -276,7 +276,7 @@ class AccompanimentMidiInteraction(MidiInteraction):
   """
 
   def __init__(self, midi_hub, qpm, sequence_generator, predictahead_steps,
-               history_steps=48):
+               history_steps=32):
     super(AccompanimentMidiInteraction, self).__init__(midi_hub, qpm)
     self._sequence_generator = sequence_generator
     self._predictahead_steps = predictahead_steps

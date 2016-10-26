@@ -20,6 +20,7 @@ import magenta
 from magenta.models.accompaniment_rnn import accompaniment_rnn_encoder_decoder
 
 FLAGS = tf.app.flags.FLAGS
+'''
 tf.app.flags.DEFINE_string(
     'config',
     None,
@@ -49,7 +50,7 @@ tf.app.flags.DEFINE_string(
     'String representation of a Python dictionary containing hyperparameter '
     'to value mapping. This mapping is merged with the default '
     'hyperparameters if `--config` is also supplied.')
-
+'''
 
 class AccompanimentRnnConfigException(Exception):
   pass
