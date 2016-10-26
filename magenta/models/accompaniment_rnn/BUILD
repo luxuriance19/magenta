@@ -21,7 +21,7 @@ py_library(
     srcs = ["accompaniment_rnn_config.py"],
     srcs_version = "PY2AND3",
     visibility = [
-        # internal pipeline runner
+        # internal model:accompaniment_rnn
     ],
     deps = [
         "//magenta",

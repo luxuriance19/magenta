@@ -17,6 +17,7 @@
 import tensorflow as tf
 import magenta
 
+
 def build_graph(mode, config, sequence_example_file=None):
   """Builds the TensorFlow graph.
 
