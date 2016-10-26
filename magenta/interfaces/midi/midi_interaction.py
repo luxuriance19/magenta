@@ -267,12 +267,12 @@ class AccompanimentMidiInteraction(MidiInteraction):
 
   Args:
     midi_hub: The MidiHub to use for MIDI I/O.
-    qpm: The quarters per minute to use for this interaction.
+    qpm: The quarter notes per minute to use for this interaction.
     sequence_generator: The SequenceGenerator to use to generate the
         accompanying voice in this interaction.
-    predictahead_quarters: The number of quarter notes to start prediction past
-        the end of the captured sequence. Should be determined by how the model
-        underlying the generator was trained.
+    predictahead_steps: The number of steps to start prediction past the end of
+        the captured sequence. May be determined by how the model underlying
+        the generator was trained.
   """
 
   def __init__(self, midi_hub, qpm, sequence_generator, predictahead_steps,
@@ -306,8 +306,8 @@ class AccompanimentMidiInteraction(MidiInteraction):
     player = self._midi_hub.start_playback(
         accompaniment_sequence, allow_updates=True)
     while not self._stop_signal.is_set():
-      # Offset of end of captured sequence in quarter notes from the epoch.
-      capture_end_steps = accompaniment_end_steps - 1
+      # Offset of end of captured sequence in steps from the epoch.
+      capture_end_steps = accompaniment_end_steps - self._predictahead_steps + 1
       captured_sequence = captor.captured_sequence(
           end_time=capture_end_steps * step_duration)
       generation_end_steps = capture_end_steps + self._predictahead_steps
@@ -316,7 +316,7 @@ class AccompanimentMidiInteraction(MidiInteraction):
         generator_options = generator_pb2.GeneratorOptions()
 
         input_start_time = (
-            max(start_steps, accompaniment_end_steps - self._history_steps) *
+            max(start_steps, capture_end_steps - self._history_steps) *
             step_duration)
         generator_options.input_sections.add(
             start_time=input_start_time,
