@@ -150,12 +150,11 @@ def main(unused_argv):
              'play again.')
 
   elif FLAGS.interaction_type == 'accompaniment':
-    FLAGS.predictahead_steps = 2
     interaction = midi_interaction.AccompanimentMidiInteraction(
         hub,
         FLAGS.qpm,
         generator,
-        predictahead_steps=2)
+        predictahead_steps=generator.predictahead_steps)
   else:
     print "Unknown interaction type: '%s'" % FLAGS.interaction_type
     return

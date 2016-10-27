@@ -57,6 +57,10 @@ class AccompanimentRnnSequenceGenerator(magenta.music.BaseSequenceGenerator):
     self._config.hparams.dropout_keep_prob = 1.0
     self._config.hparams.batch_size = 1
 
+  @property
+  def predictahead_steps(self):
+    return self._config.predictahead_steps
+
   def _initialize_with_checkpoint(self, checkpoint_file):
     graph = accompaniment_rnn_graph.build_graph('generate', self._config)
     with graph.as_default():

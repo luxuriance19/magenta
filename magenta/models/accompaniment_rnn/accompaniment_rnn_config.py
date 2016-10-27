@@ -52,6 +52,7 @@ tf.app.flags.DEFINE_string(
     'hyperparameters if `--config` is also supplied.')
 '''
 
+
 class AccompanimentRnnConfigException(Exception):
   pass
 
