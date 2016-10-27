@@ -65,7 +65,7 @@ tf.app.flags.DEFINE_string(
     'bundle_file',
     None,
     'The location of the bundle file to use.')
-tf.app.flags.DEFINE_string(
+tf.app.flags.DEFINE_integer(
     'temperature_control',
     None,
     'The location of the bundle file to use.')
@@ -139,13 +139,13 @@ def main(unused_argv):
              'with value 0.' % FLAGS.start_call_control)
     print 'Play when you hear the metronome ticking.'
     if FLAGS.phrase_bars is not None:
-      print ('After %d bars (4 beats), Magenta will play its response.' %
+      print ('After %d bars (of 4 beats), Magenta will play its response.' %
              FLAGS.phrase_bars)
     else:
       print ('When you want to end the call phrase, signal control number %d '
              'with value 0' % FLAGS.phrase_control)
-      print ('At the end of the current bar (4 beats), Magenta will play its '
-             'response.')
+      print ('At the end of the current bar (of 4 beats), Magenta will play '
+             'its response.')
     if FLAGS.start_call_control is not None:
       print ('Once the response completes, the interface will wait for you to '
              'signal a new call phrase using control number %d.' %

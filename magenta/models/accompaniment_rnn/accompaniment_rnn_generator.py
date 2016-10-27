@@ -21,7 +21,6 @@ import tensorflow as tf
 
 import magenta
 
-from magenta.models.accompaniment_rnn import accompaniment_rnn_config
 from magenta.models.accompaniment_rnn import accompaniment_rnn_model
 from magenta.models.accompaniment_rnn.accompaniment_rnn_encoder_decoder import MelodyPair
 
