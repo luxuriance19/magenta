@@ -13,19 +13,17 @@
 # limitations under the License.
 """Accompaniment RNN generation code as a SequenceGenerator interface."""
 
-import copy
 from functools import partial
 import random
 
 # internal imports
-from six.moves import range  # pylint: disable=redefined-builtin
 import tensorflow as tf
 
 import magenta
 
 from magenta.models.accompaniment_rnn import accompaniment_rnn_config
-from magenta.models.accompaniment_rnn import accompaniment_rnn_encoder_decoder
-from magenta.models.accompaniment_rnn import accompaniment_rnn_graph
+from magenta.models.accompaniment_rnn import accompaniment_rnn_model
+from magenta.models.accompaniment_rnn.accompaniment_rnn_encoder_decoder import MelodyPair
 
 
 STEPS_PER_QUARTER = 4
@@ -38,53 +36,25 @@ class AccompanimentRnnSequenceGenerator(magenta.music.BaseSequenceGenerator):
   instrument 0.
 
   Args:
-      config: An AccompanimentRnnConfig containing the GeneratorDetails,
-          MelodyEncoderDecoder, and HParams to use.
+      model: Instance of AccompanimentRnnModel.
+      details: A generator_pb2.GeneratorDetails for this generator.
+      steps_per_quarter: What precision to use when quantizing the melody. How
+          many steps per quarter note.
       checkpoint: Where to search for the most recent model checkpoint. Mutually
           exclusive with `bundle`.
       bundle: A GeneratorBundle object that includes both the model checkpoint
           and metagraph. Mutually exclusive with `checkpoint`.
   """
 
-  def __init__(self, config, checkpoint=None, bundle=None):
+  def __init__(self, model, details, checkpoint=None, bundle=None):
     super(AccompanimentRnnSequenceGenerator, self).__init__(
-        config.details, checkpoint, bundle)
+        model, details, checkpoint, bundle)
     self._session = None
-
     self._steps_per_quarter = STEPS_PER_QUARTER
-    self._config = config
-    # Override hparams for generation.
-    self._config.hparams.dropout_keep_prob = 1.0
-    self._config.hparams.batch_size = 1
 
   @property
   def predictahead_steps(self):
-    return self._config.predictahead_steps
-
-  def _initialize_with_checkpoint(self, checkpoint_file):
-    graph = accompaniment_rnn_graph.build_graph('generate', self._config)
-    with graph.as_default():
-      saver = tf.train.Saver()
-      self._session = tf.Session()
-      tf.logging.info('Checkpoint used: %s', checkpoint_file)
-      saver.restore(self._session, checkpoint_file)
-
-  def _initialize_with_checkpoint_and_metagraph(self, checkpoint_filename,
-                                                metagraph_filename):
-    with tf.Graph().as_default():
-      self._session = tf.Session()
-      new_saver = tf.train.import_meta_graph(metagraph_filename)
-      new_saver.restore(self._session, checkpoint_filename)
-
-  def _write_checkpoint_with_metagraph(self, checkpoint_filename):
-    with self._session.graph.as_default():
-      saver = tf.train.Saver(sharded=False)
-      saver.save(self._session, checkpoint_filename, meta_graph_suffix='meta',
-                 write_meta_graph=True)
-
-  def _close(self):
-    self._session.close()
-    self._session = None
+    return self._model.config.predictahead_steps
 
   def _seconds_to_steps(self, seconds, qpm):
     """Converts seconds to steps.
@@ -149,8 +119,7 @@ class AccompanimentRnnSequenceGenerator(magenta.music.BaseSequenceGenerator):
     start_step = self._seconds_to_steps(generate_section.start_time, qpm)
     end_step = self._seconds_to_steps(generate_section.end_time, qpm)
 
-    encoder_decoder = self._config.encoder_decoder
-    predictahead_steps = encoder_decoder.predictahead_steps
+    predictahead_steps = self.predictahead_steps
     if start_step < predictahead_steps:
       raise magenta.music.SequenceGeneratorException(
           'Got GenerateSection request for section that is before the '
@@ -177,58 +146,16 @@ class AccompanimentRnnSequenceGenerator(magenta.music.BaseSequenceGenerator):
           'Input sequence should have between 1 and 2 extractable melodies. '
           'Got %d.' % len(extracted_melodies))
 
-    transpose_amounts = (
-        main_melody.squash(encoder_decoder.min_note,
-                           encoder_decoder.max_note,
-                           encoder_decoder.transpose_to_key),
-        accompaniment.squash(encoder_decoder.min_note,
-                             encoder_decoder.max_note,
-                             encoder_decoder.transpose_to_key))
-
     # Ensure that the accompaniment extends up to the step we want to start
     # generating.
     accompaniment.set_length(start_step - accompaniment.start_step)
 
-    graph_inputs = self._session.graph.get_collection('inputs')[0]
-    graph_initial_state = self._session.graph.get_collection('initial_state')[0]
-    graph_final_state = self._session.graph.get_collection('final_state')[0]
-    graph_softmax = self._session.graph.get_collection('softmax')[0]
-    graph_temperature = self._session.graph.get_collection('temperature')[0]
-
-    final_state = None
-    for i in range(end_step - accompaniment.end_step):
-      if encoder_decoder.predictahead_steps == 0:
-        # Add padding.
-        accompaniment.set_length(len(accompaniment) + 1)
-
-      main_melody_prefix = copy.deepcopy(main_melody)
-      main_melody_prefix.set_length(len(accompaniment))
-      melody_pair = accompaniment_rnn_encoder_decoder.MelodyPair(
-          main_melody_prefix, accompaniment)
-      if i == 0:
-        inputs = encoder_decoder.get_inputs_batch([melody_pair],
-                                                  full_length=True)
-        initial_state = self._session.run(graph_initial_state)
-      else:
-        inputs = encoder_decoder.get_inputs_batch([melody_pair])
-        initial_state = final_state
-
-      feed_dict = {graph_inputs: inputs,
-                   graph_initial_state: initial_state,
-                   graph_temperature: temperature}
-      final_state, softmax = self._session.run(
-          [graph_final_state, graph_softmax], feed_dict)
-      if encoder_decoder.predictahead_steps == 0:
-        # Remove padding.
-        accompaniment.set_length(len(accompaniment) - 1)
-
-      encoder_decoder.extend_melodies([accompaniment], softmax)
-
-    main_melody.transpose(-transpose_amounts[0])
-    accompaniment.transpose(-transpose_amounts[1])
-    sequence = main_melody.to_sequence(instrument=0, qpm=qpm)
+    primer_pair = MelodyPair(main_melody, accompaniment)
+    generated_pair = self._model.generate_melody_pair(
+        end_step - start_step, primer_pair, temperature)
+    sequence = generated_pair[0].to_sequence(instrument=0, qpm=qpm)
     sequence.notes.extend(
-        accompaniment.to_sequence(instrument=1, qpm=qpm).notes)
+        generated_pair[1].to_sequence(instrument=1, qpm=qpm).notes)
     return sequence
 
 
@@ -242,5 +169,7 @@ def get_generator_map():
     Map from the generator ID to its SequenceGenerator class with a bound
     `config` argument.
   """
-  return {key: partial(AccompanimentRnnSequenceGenerator, config)
-          for (key, config) in accompaniment_rnn_config.default_configs.items()}
+  return {key: partial(AccompanimentRnnSequenceGenerator,
+                       accompaniment_rnn_model.AccompanimentRnnModel(config),
+                       config.details)
+          for (key, config) in accompaniment_rnn_model.default_configs.items()}

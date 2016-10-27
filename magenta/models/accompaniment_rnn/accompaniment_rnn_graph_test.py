@@ -17,15 +17,15 @@
 import tensorflow as tf
 import magenta
 
-from magenta.models.accompaniment_rnn import accompaniment_rnn_config
 from magenta.models.accompaniment_rnn import accompaniment_rnn_encoder_decoder
 from magenta.models.accompaniment_rnn import accompaniment_rnn_graph
+from magenta.models.accompaniment_rnn import accompaniment_rnn_model
 
 
 class AccompanimentRnnGraphTest(tf.test.TestCase):
 
   def setUp(self):
-    self.config = accompaniment_rnn_config.AccompanimentRnnConfig(
+    self.config = accompaniment_rnn_model.AccompanimentRnnConfig(
         None,
         accompaniment_rnn_encoder_decoder.AccompanimentRnnEncoderDecoder(
             magenta.music.LookbackMelodyEncoderDecoder(),

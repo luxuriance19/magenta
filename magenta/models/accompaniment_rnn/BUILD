@@ -62,15 +62,26 @@ py_test(
 )
 
 py_library(
+    name = "accompaniment_rnn_model",
+    srcs = ["accompaniment_rnn_model.py"],
+    srcs_version = "PY2AND3",
+    deps = [
+        ":accompaniment_rnn_graph",
+        "//magenta",
+        # tensorflow dep
+    ],
+)
+
+py_library(
     name = "accompaniment_rnn_generator",
     srcs = ["accompaniment_rnn_generator.py"],
     srcs_version = "PY2AND3",
     visibility = ["//magenta/interfaces:generator_interfaces"],
     deps = [
         ":accompaniment_rnn_config",
-        ":accompaniment_rnn_graph",
+        ":accompaniment_rnn_encoder_decoder",
+        ":accompaniment_rnn_model",
         "//magenta",
-        # numpy dep
         # tensorflow dep
     ],
 )
@@ -82,6 +93,7 @@ py_binary(
     deps = [
         ":accompaniment_rnn_config",
         ":accompaniment_rnn_generator",
+        ":accompaniment_rnn_model",
         "//magenta",
         # tensorflow dep
     ],
