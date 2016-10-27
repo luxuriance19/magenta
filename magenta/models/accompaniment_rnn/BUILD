@@ -16,9 +16,10 @@
 
 licenses(["notice"])  # Apache 2.0
 
+
 py_library(
-    name = "accompaniment_rnn_config",
-    srcs = ["accompaniment_rnn_config.py"],
+    name = "accompaniment_rnn_config_flags",
+    srcs = ["accompaniment_rnn_config_flags.py"],
     srcs_version = "PY2AND3",
     visibility = [
         # internal model:accompaniment_rnn
@@ -39,6 +40,17 @@ py_library(
     ],
 )
 
+py_test(
+    name = "accompaniment_rnn_encoder_decoder_test",
+    srcs = ["accompaniment_rnn_encoder_decoder_test.py"],
+    srcs_version = "PY2AND3",
+    deps = [
+        ":accompaniment_rnn_encoder_decoder",
+        "//magenta",
+        # tensorflow dep
+    ],
+)
+
 py_library(
     name = "accompaniment_rnn_graph",
     srcs = ["accompaniment_rnn_graph.py"],
@@ -54,7 +66,8 @@ py_test(
     srcs = ["accompaniment_rnn_graph_test.py"],
     srcs_version = "PY2AND3",
     deps = [
-        ":accompaniment_rnn_config",
+        ":accompaniment_rnn_model",
+        ":accompaniment_rnn_encoder_decoder",
         ":accompaniment_rnn_graph",
         "//magenta",
         # tensorflow dep
@@ -78,7 +91,6 @@ py_library(
     srcs_version = "PY2AND3",
     visibility = ["//magenta/interfaces:generator_interfaces"],
     deps = [
-        ":accompaniment_rnn_config",
         ":accompaniment_rnn_encoder_decoder",
         ":accompaniment_rnn_model",
         "//magenta",
@@ -91,7 +103,7 @@ py_binary(
     srcs = ["accompaniment_rnn_generate.py"],
     srcs_version = "PY2AND3",
     deps = [
-        ":accompaniment_rnn_config",
+        ":accompaniment_rnn_config_flags",
         ":accompaniment_rnn_generator",
         ":accompaniment_rnn_model",
         "//magenta",

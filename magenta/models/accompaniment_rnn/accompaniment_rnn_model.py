@@ -55,8 +55,8 @@ class AccompanimentRnnModel(magenta.music.BaseModel):
     return accompaniment_rnn_graph.build_graph('generate', self._config)
 
   @property
-  def config(self):
-    return copy.deepcopy(self._config)
+  def predictahead_steps(self):
+    return self._config.encoder_decoder.predictahead_steps
 
   def generate_melody_pair(self, num_steps, primer_melody_pair,
                            temperature=1.0):
@@ -97,7 +97,7 @@ class AccompanimentRnnModel(magenta.music.BaseModel):
         accompaniment.set_length(len(accompaniment) + 1)
 
       main_melody_prefix = copy.deepcopy(main_melody)
-      main_melody_prefix.set_length(accompaniment)
+      main_melody_prefix.set_length(len(accompaniment))
       melody_pair = accompaniment_rnn_encoder_decoder.MelodyPair(
           main_melody_prefix, accompaniment)
       if i == 0:

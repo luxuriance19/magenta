@@ -89,7 +89,7 @@ default_configs = {
         magenta.music.LookbackMelodyEncoderDecoder(),
         magenta.common.HParams(
             batch_size=128,
-            rnn_layer_sizes=[128, 128],
+            rnn_layer_sizes=[512, 512],
             dropout_keep_prob=0.5,
             skip_first_n_losses=0,
             clip_norm=5,

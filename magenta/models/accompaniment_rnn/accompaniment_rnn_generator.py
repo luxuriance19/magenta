@@ -54,7 +54,7 @@ class AccompanimentRnnSequenceGenerator(magenta.music.BaseSequenceGenerator):
 
   @property
   def predictahead_steps(self):
-    return self._model.config.predictahead_steps
+    return self._model.predictahead_steps
 
   def _seconds_to_steps(self, seconds, qpm):
     """Converts seconds to steps.
