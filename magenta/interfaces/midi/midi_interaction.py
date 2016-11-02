@@ -315,14 +315,18 @@ class AccompanimentMidiInteraction(MidiInteraction):
     predictahead_steps: The number of steps to start prediction past the end of
         the captured sequence. May be determined by how the model underlying
         the generator was trained.
+    steps_per_bar: The number of steps in each bar/measure.
+    history_bars: The number of bars to supply to the generator as the input
+        sequence in addition to any current (incomplete) bar.
   """
 
   def __init__(self, midi_hub, qpm, sequence_generator, predictahead_steps,
-               history_steps=32):
+               steps_per_bar=16, history_bars=2):
     super(AccompanimentMidiInteraction, self).__init__(midi_hub, qpm)
     self._sequence_generator = sequence_generator
     self._predictahead_steps = predictahead_steps
-    self._history_steps = history_steps
+    self._steps_per_bar = steps_per_bar
+    self._history_bars = history_bars
 
   def run(self):
     """The main loop for a real-time accompaniment interaction.
@@ -357,8 +361,12 @@ class AccompanimentMidiInteraction(MidiInteraction):
       if captured_sequence.notes:
         generator_options = generator_pb2.GeneratorOptions()
 
+        metric_position = (
+            (capture_end_steps - start_steps) % self._steps_per_bar)
         input_start_time = (
-            max(start_steps, capture_end_steps - self._history_steps) *
+            max(start_steps,
+                (capture_end_steps + metric_position -
+                 (self._history_bars * self._steps_per_bar))) *
             step_duration)
         generator_options.input_sections.add(
             start_time=input_start_time,

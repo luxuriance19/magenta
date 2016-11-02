@@ -137,7 +137,7 @@ class AccompanimentRnnSequenceGenerator(magenta.music.BaseSequenceGenerator):
       accompaniment = magenta.music.Melody(
           [magenta.music.constants.MELODY_NO_EVENT] *
           (start_step - main_melody.start_step) +
-          [random.randint(16, 54)],
+          [random.randint(32, 54)],
           start_step=main_melody.start_step)
       start_step += 1
     else:
