@@ -321,7 +321,7 @@ class AccompanimentMidiInteraction(MidiInteraction):
   """
 
   def __init__(self, midi_hub, qpm, sequence_generator, predictahead_steps,
-               steps_per_bar=16, history_bars=2):
+               steps_per_bar=16, history_bars=3):
     super(AccompanimentMidiInteraction, self).__init__(midi_hub, qpm)
     self._sequence_generator = sequence_generator
     self._predictahead_steps = predictahead_steps
@@ -337,20 +337,32 @@ class AccompanimentMidiInteraction(MidiInteraction):
     """
     # How should we handle the start time? Wait until the first note is played?
     step_duration = 60.0 / (self._qpm * 4)
-    start_steps = (time.time() + 1.0) // step_duration
+    start_steps = (time.time() + 1.0) // step_duration + 48
 
     # Offset of end of accompaniment in steps from the epoch.
     accompaniment_end_steps = start_steps + self._predictahead_steps
-    accompaniment_sequence = music_pb2.NoteSequence()
 
     # Start metronome.
-    self._midi_hub.start_metronome(self._qpm, start_steps * step_duration)
+    self._midi_hub.start_metronome(self._qpm, (start_steps - 48) * step_duration)
+
+    accompaniment_sequence = self._midi_hub.capture_sequence(
+        self._qpm, (start_steps - 32) * step_duration,
+        stop_time=(start_steps - 16) * step_duration)
+
+    for note in accompaniment_sequence.notes:
+      note.start_time += 32 * step_duration
+      note.end_time += 32 * step_duration
+      note.instrument = 1
+    accompaniment_sequence.total_time += 32 * step_duration
+    accompaniment_end_steps = start_steps + 16
+
     # Start captor.
     captor = self._midi_hub.start_capture(self._qpm,
                                           start_steps * step_duration)
     # Start player.
     player = self._midi_hub.start_playback(
         accompaniment_sequence, allow_updates=True)
+
     while not self._stop_signal.is_set():
       # Offset of end of captured sequence in steps from the epoch.
       capture_end_steps = accompaniment_end_steps - self._predictahead_steps + 1

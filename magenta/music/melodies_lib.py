@@ -249,6 +249,7 @@ class Melody(events_lib.SimpleEventSequence):
   def from_quantized_sequence(self,
                               quantized_sequence,
                               start_step=0,
+                              offset=None,
                               track=0,
                               gap_bars=1,
                               ignore_polyphonic_notes=False,
@@ -293,7 +294,6 @@ class Melody(events_lib.SimpleEventSequence):
     """
     self._reset()
 
-    offset = None
     steps_per_bar_float = quantized_sequence.steps_per_bar()
     if steps_per_bar_float % 1 != 0:
       raise events_lib.NonIntegerStepsPerBarException(
@@ -306,7 +306,6 @@ class Melody(events_lib.SimpleEventSequence):
     # Sort track by note start times, and secondarily by pitch descending.
     notes = sorted(quantized_sequence.tracks[track],
                    key=lambda note: (note.start, -note.pitch))
-
     for note in notes:
       if note.start < start_step:
         continue
@@ -530,6 +529,8 @@ class Melody(events_lib.SimpleEventSequence):
 
 
 def extract_melodies(quantized_sequence,
+                     start_step=0,
+                     offset=None,
                      min_bars=7,
                      max_steps_truncate=None,
                      max_steps_discard=None,
@@ -603,7 +604,7 @@ def extract_melodies(quantized_sequence,
       [0, 1, 10, 20, 30, 40, 50, 100, 200, 500, min_bars // 2, min_bars,
        min_bars + 1, min_bars - 1])
   for track in quantized_sequence.tracks:
-    start = 0
+    start = start_step
 
     # Quantize the track into a Melody object.
     # If any notes start at the same time, only one is kept.
@@ -614,6 +615,7 @@ def extract_melodies(quantized_sequence,
             quantized_sequence,
             track=track,
             start_step=start,
+            offset=offset,
             gap_bars=gap_bars,
             ignore_polyphonic_notes=ignore_polyphonic_notes,
             pad_end=pad_end)

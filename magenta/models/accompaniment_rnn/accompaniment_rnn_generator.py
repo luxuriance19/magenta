@@ -83,11 +83,16 @@ class AccompanimentRnnSequenceGenerator(magenta.music.BaseSequenceGenerator):
                    if 'temperature' in generator_options.args else 1.0)
     generate_section = generator_options.generate_sections[0]
 
+    qpm = (input_sequence.tempos[0].qpm if input_sequence and
+           input_sequence.tempos else magenta.music.DEFAULT_QUARTERS_PER_MINUTE)
+
+    input_start_step = 0
     # If input section exists, use it to limit the input sequence.
     if generator_options.input_sections:
       input_section = generator_options.input_sections[0]
       input_sequence = magenta.music.extract_subsequence(
           input_sequence, input_section.start_time, input_section.end_time)
+      input_start_step = self._seconds_to_steps(input_section.start_time, qpm)
 
     accompaniment_end_times = [
         n.end_time for n in input_sequence.notes if n.instrument == 1]
@@ -107,14 +112,14 @@ class AccompanimentRnnSequenceGenerator(magenta.music.BaseSequenceGenerator):
     # Setting gap_bars to infinite ensures that the entire input will be used.
     extracted_melodies, _ = magenta.music.extract_melodies(
         quantized_sequence,
+        start_step=input_start_step,
+        offset=input_start_step,
         min_bars=0,
         min_unique_pitches=1,
         gap_bars=float('inf'),
         ignore_polyphonic_notes=True)
     assert 1 <= len(extracted_melodies) <= 2
 
-    qpm = (input_sequence.tempos[0].qpm if input_sequence and
-           input_sequence.tempos else magenta.music.DEFAULT_QUARTERS_PER_MINUTE)
     start_step = self._seconds_to_steps(generate_section.start_time, qpm)
     end_step = self._seconds_to_steps(generate_section.end_time, qpm)
 
@@ -147,11 +152,16 @@ class AccompanimentRnnSequenceGenerator(magenta.music.BaseSequenceGenerator):
 
     # Ensure that the accompaniment extends up to the step we want to start
     # generating.
+    print list(main_melody)
+    print list(accompaniment)
+    print start_step - accompaniment.start_step, len(accompaniment)
     accompaniment.set_length(start_step - accompaniment.start_step)
+    print list(accompaniment)
 
     primer_pair = MelodyPair(main_melody, accompaniment)
     generated_pair = self._model.generate_melody_pair(
         end_step - start_step, primer_pair, temperature)
+    print list(generated_pair[1])
     sequence = generated_pair[0].to_sequence(instrument=0, qpm=qpm)
     sequence.notes.extend(
         generated_pair[1].to_sequence(instrument=1, qpm=qpm).notes)
