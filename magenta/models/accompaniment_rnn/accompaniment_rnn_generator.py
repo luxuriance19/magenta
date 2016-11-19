@@ -152,16 +152,11 @@ class AccompanimentRnnSequenceGenerator(magenta.music.BaseSequenceGenerator):
 
     # Ensure that the accompaniment extends up to the step we want to start
     # generating.
-    print list(main_melody)
-    print list(accompaniment)
-    print start_step - accompaniment.start_step, len(accompaniment)
     accompaniment.set_length(start_step - accompaniment.start_step)
-    print list(accompaniment)
 
     primer_pair = MelodyPair(main_melody, accompaniment)
     generated_pair = self._model.generate_melody_pair(
         end_step - start_step, primer_pair, temperature)
-    print list(generated_pair[1])
     sequence = generated_pair[0].to_sequence(instrument=0, qpm=qpm)
     sequence.notes.extend(
         generated_pair[1].to_sequence(instrument=1, qpm=qpm).notes)
