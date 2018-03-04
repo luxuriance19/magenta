@@ -16,11 +16,13 @@ If your application has a high QPS, you must mirror these files on your own serv
 
 See the [demo](/magenta/models/music_vae/js/demo) for example usage.
 
-## Test Usage
+## Example Commands
 
 `yarn install` to get dependencies
 
-`yarn run build` to produce a commonjs version with typescript definitions for MusicVAE in the dist/ folder that can then be consumed by others over NPM.
+`yarn run build` to produce a commonjs version with typescript definitions for MusicVAE in the `es5/` folder that can then be consumed by others over NPM.
+
+`yarn run bundle` to produce a bundled version `dist/`.
 
 `yarn run build-demo` to build the demo.
 
