@@ -1,6 +1,6 @@
 # MusicVAE Deeplearn.js Implementation
 
-This JavaScript implementation of [MusicVAE][https://g.co/magenta/music-vae] uses [Deeplearn.js](https://deeplearnjs.org) for GPU-accelerated inference.
+This JavaScript implementation of [MusicVAE](https://g.co/magenta/music-vae) uses [Deeplearn.js](https://deeplearnjs.org) for GPU-accelerated inference.
 
 ## Usage
 
