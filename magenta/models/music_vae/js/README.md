@@ -1,10 +1,10 @@
 # MusicVAE Deeplearn.js Implementation
 
-This JavaScript implementation of [MusicVAE][https://g.co/magenta/music-vae] uses [Deeplearn.js][https://deeplearnjs.org] for GPU-accelerated inference.
+This JavaScript implementation of [MusicVAE][https://g.co/magenta/music-vae] uses [Deeplearn.js](https://deeplearnjs.org) for GPU-accelerated inference.
 
 ## Usage
 
-To use in your application, install the npm package [@magenta/music-vae][https://www.npmjs.com/package/@magenta/music-vae] or use the [pre-built library][/magenta/models/music-vae/js/dist/].
+To use in your application, install the npm package [@magenta/music-vae](https://www.npmjs.com/package/@magenta/music-vae), or use the [pre-built library](/magenta/models/music-vae/js/dist/).
 
 For a complete guide on how to build an app with MusicVAE, read the [Melody Mixer tutorial][mm-tutorial].
 
