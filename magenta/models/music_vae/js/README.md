@@ -22,7 +22,7 @@ See the [demo](/magenta/models/music_vae/js/demo) for example usage.
 
 `yarn run build` to produce a commonjs version with typescript definitions for MusicVAE in the `es5/` folder that can then be consumed by others over NPM.
 
-`yarn run bundle` to produce a bundled version `dist/`.
+`yarn run bundle` to produce a bundled version in `dist/`.
 
 `yarn run build-demo` to build the demo.
 
