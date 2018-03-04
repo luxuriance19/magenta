@@ -6,7 +6,7 @@ This JavaScript implementation of [MusicVAE](https://g.co/magenta/music-vae) use
 
 To use in your application, install the npm package [@magenta/music-vae](https://www.npmjs.com/package/@magenta/music-vae), or use the [pre-built library](/magenta/models/music-vae/js/dist/).
 
-For a complete guide on how to build an app with MusicVAE, read the [Melody Mixer tutorial][mm-tutorial].
+For a complete guide on how to build an app with MusicVAE, read the [Melody Mixer tutorial][cl-tutorial].
 
 ## Pre-trained Checkpoints
 
@@ -14,7 +14,7 @@ Several pre-trained MusicVAE checkpoints are hosted on GCS. While we do not plan
 
 If your application has a high QPS, you must mirror these files on your own server.
 
-See the [Melody Mixer tutorial][mm-tutorial] for example usage.
+See the [demo][/magenta/models/music-vae/js/demo] for example usage.
 
 ## Test Usage
 
@@ -26,4 +26,4 @@ See the [Melody Mixer tutorial][mm-tutorial] for example usage.
 
 `http-server demo/` to see it working.
 
-[mm-tutorial]: http://TBD
+[cl-tutorial]: http://TBD
