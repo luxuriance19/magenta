@@ -14,7 +14,7 @@ Several pre-trained MusicVAE checkpoints are hosted on GCS. While we do not plan
 
 If your application has a high QPS, you must mirror these files on your own server.
 
-See the [demo](/magenta/models/music-vae/js/demo) for example usage.
+See the [demo](/magenta/models/music_vae/js/demo) for example usage.
 
 ## Test Usage
 
