@@ -1,11 +1,11 @@
 ## MusicVAE: A hierarchical recurrent variational autoencoder for music.
 
-MusicVAE learns a latent space of musical sequences, providing different modes
+[MusicVAE][blog] learns a latent space of musical sequences, providing different modes
 of interactive musical creation, including:
 
 * random sampling from the prior distribution,
 * interpolation between existing sequences,
-* manipulation of existing sequences via a [latent constraint model](https://goo.gl/STGMGx).
+* manipulation of existing sequences via a attributes vectors.
 
 For short sequences (e.g., 2-bar "loops"), we use a bidirectional LSTM encoder
 and LSTM decoder. For longer sequences, we use a novel hierarchical LSTM
@@ -18,13 +18,13 @@ Representations of melodies/bass-lines and drums are based on those used
 by [MelodyRNN](/magenta/models/melody_rnn) and
 [DrumsRNN](/magenta/models/drums_rnn).
 
-For additional model details, see our [paper](https://nips2017creativity.github.io/doc/Hierarchical_Variational_Autoencoders_for_Music.pdf).
+For additional details, see our [blog post][blog] and [paper][paper].
 
 ### How To Use
 
 #### Colab Notebook w/ Pre-trained Models
 The easiest way to get started using a MusicVAE model is via our
-[Colab Notebook](https://colab.research.google.com/notebook#fileId=/v2/external/notebooks/magenta/music_vae/music_vae.ipynb).
+[Colab Notebook][colab].
 The notebook contains instructions for sampling interpolating, and manipulating
 musical sequences with pre-trained MusicVAEs for melodies, drums, and
 three-piece "trios" (melody, bass, drums) of varying lengths.
@@ -61,4 +61,13 @@ heldout dataset) in order to compute metrics such as accuracy and to avoid
 overfitting.
 
 Once your model has trained sufficiently, you can load the checkpoint into the
-[Colab Notebook](https://colab.research.google.com/notebook#fileId=/v2/external/notebooks/magenta/music_vae/music_vae.ipynb) to do inference and produce audio outputs.
+[Colab Notebook][colab] to do inference and produce audio outputs.
+
+#### JavaScript w/ Pre-Trained Models
+We have created a JavaScript implementation of MusicVAE using [deeplearn.js](https://deeplearnjs.org) for GPU-accelerated inference in the browser.
+
+For more details hop over to the [repo](/magenta/models/music_vae/js).
+
+[colab]: https://colab.research.google.com/notebook#fileId=/v2/external/notebooks/magenta/music_vae/music_vae.ipynb
+[blog]: https://g.co/magenta/music-vae
+[paper]: https://arxiv.org/abs/TBD
