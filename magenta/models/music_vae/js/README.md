@@ -1,16 +1,16 @@
-# MusicVAE Deeplearn.js Implementation
+# MusicVAE Deeplearn.js API
 
 This JavaScript implementation of [MusicVAE](https://g.co/magenta/music-vae) uses [Deeplearn.js](https://deeplearnjs.org) for GPU-accelerated inference.
 
 ## Usage
 
-To use in your application, install the npm package [@magenta/music-vae](https://www.npmjs.com/package/@magenta/music-vae), or use the [pre-built library](/magenta/models/music-vae/js/dist/).
+To use in your application, install the npm package [@magenta/music-vae](https://www.npmjs.com/package/@magenta/music-vae), or use the [pre-built bundle](/magenta/models/music-vae/js/dist/).
 
 For a complete guide on how to build an app with MusicVAE, read the [Melody Mixer tutorial][cl-tutorial].
 
 ## Pre-trained Checkpoints
 
-Several pre-trained MusicVAE checkpoints are hosted on GCS. While we do not plan to remove any of the current checkpoints, we will be adding more in the future, so your applications should reference the [checkpoints.js](https://storage.googleapis.com/download.magenta.tensorflow.org/models/music_vae/dljs/checkpoints.json) file to see what checkpoints are available, which `DataConverter` they use, and what arguments to pass to the `DataConverter`.
+Several pre-trained MusicVAE checkpoints are hosted on GCS. While we do not plan to remove any of the current checkpoints, we will be adding more in the future, so your applications should reference the [checkpoints.js](https://storage.googleapis.com/download.magenta.tensorflow.org/models/music_vae/dljs/checkpoints.json) file to see which checkpoints are available.
 
 If your application has a high QPS, you must mirror these files on your own server.
 
@@ -28,4 +28,4 @@ See the [demo](/magenta/models/music_vae/js/demo) for example usage.
 
 `http-server demo/` to see it working.
 
-[cl-tutorial]: http://TBD
+[cl-tutorial]: https://medium.com/@torinblankensmith/8ad5b42b4d0b
