@@ -6,6 +6,13 @@ This JavaScript implementation of [MusicVAE](https://g.co/magenta/music-vae) use
 
 To use in your application, install the npm package [@magenta/music-vae](https://www.npmjs.com/package/@magenta/music-vae), or use the [pre-built bundle](/magenta/models/music-vae/js/dist/).
 
+You can then instantiate a `MusicVAE` object with:
+
+```
+let mvae = new MusicVAE('/path/to/checkpoint')
+```
+
+See the [demo](magenta/models/music/vae/js/demo) for example usage.
 For a complete guide on how to build an app with MusicVAE, read the [Melody Mixer tutorial][cl-tutorial].
 
 ## Pre-trained Checkpoints
