@@ -12,7 +12,8 @@ You can then instantiate a `MusicVAE` object with:
 let mvae = new MusicVAE('/path/to/checkpoint')
 ```
 
-See the [demo](magenta/models/music/vae/js/demo) for example usage.
+See the [demo](/magenta/models/music_vae/js/demo) for example usage.
+
 For a complete guide on how to build an app with MusicVAE, read the [Melody Mixer tutorial][cl-tutorial].
 
 ## Pre-trained Checkpoints
@@ -27,11 +28,11 @@ See the [demo](/magenta/models/music_vae/js/demo) for example usage.
 
 `yarn install` to get dependencies
 
-`yarn run build` to produce a commonjs version with typescript definitions for MusicVAE in the `es5/` folder that can then be consumed by others over NPM.
+`yarn build` to produce a commonjs version with typescript definitions for MusicVAE in the `es5/` folder that can then be consumed by others over NPM.
 
-`yarn run bundle` to produce a bundled version in `dist/`.
+`yarn bundle` to produce a bundled version in `dist/`.
 
-`yarn run build-demo` to build the demo.
+`yarn build-demo` to build the demo.
 
 `http-server demo/` to see it working.
 
