@@ -18,7 +18,7 @@ For a complete guide on how to build an app with MusicVAE, read the [Melody Mixe
 
 ## Pre-trained Checkpoints
 
-Several pre-trained MusicVAE checkpoints are hosted on GCS. While we do not plan to remove any of the current checkpoints, we will be adding more in the future, so your applications should reference the [checkpoints.json](https://g.co/magenta/musicvae-checkpoints) file to see which checkpoints are available.
+Several pre-trained MusicVAE checkpoints are hosted on GCS. While we do not plan to remove any of the current checkpoints, we will be adding more in the future, so your applications should reference the [checkpoints.json](https://goo.gl/magenta/musicvae-checkpoints) file to see which checkpoints are available.
 
 If your application has a high QPS, you must mirror these files on your own server.
 
